@@ -1,11 +1,13 @@
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef MONTY_H
+#define MONTY_H
 
+#define _GNU_SOURCE
 #include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
+#include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
 #include <ctype.h>
+#include <stdarg.h>
 
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
@@ -18,9 +20,9 @@
  */
 typedef struct stack_s
 {
-	int n;
-	struct stack_s *prev;
-	struct stack_s *next;
+        int n;
+        struct stack_s *prev;
+        struct stack_s *next;
 } stack_t;
 
 /**
@@ -33,58 +35,50 @@ typedef struct stack_s
  */
 typedef struct instruction_s
 {
-	char *opcode;
-	void (*f)(stack_t **stack, unsigned int line_number);
+        char *opcode;
+        void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 
-/**
- * struct data - all data in program
- * @push_value: value to push
- * @line_num: line number of opcode
- * @opcode: the opcode
- * @mfile: file to open
- * @top: the top of stack
- * @mode: 0 mean stack, 1 mean queue
- * in stack you push in the start
- * in the queue you push at end
- */
-typedef struct data
-{
-	int push_value;
-	unsigned int line_num;
-	char *opcode;
-	FILE *mfile;
-	stack_t *top;
-	int mode;
-} data;
-data datax;
+extern stack_t *head;
+typedef void (*op_func)(stack_t **, unsigned int);
 
-/*main.c*/
-void exec(void);
-int main(int argc, char **argv);
+/*file operations*/
+void open_file(char *file_name);
+int parse_line(char *buffer, int line_number, int format);
+void read_file(FILE *);
+int len_chars(FILE *);
+void find_func(char *, char *, int, int);
 
-/*opcodes.c*/
-void _push(stack_t **top, unsigned int line_number);
-void _pall(stack_t **top, unsigned int line_number);
-void _pint(stack_t **top, unsigned int line_number);
-void _pop(stack_t **top, unsigned int line_number);
-void _swap(stack_t **top, unsigned int line_number);
-void _add(stack_t **top, unsigned int line_number);
-void _nop(stack_t **top, unsigned int line_number);
-void _sub(stack_t **top, unsigned int line_number);
-void _div(stack_t **top, unsigned int line_number);
-void _mul(stack_t **top, unsigned int line_number);
-void _mod(stack_t **top, unsigned int line_number);
-void _pchar(stack_t **top, unsigned int line_number);
-void _pstr(stack_t **top, unsigned int line_number);
-void _rotl(stack_t **top, unsigned int line_number);
-void _rotr(stack_t **top, unsigned int line_number);
-void _mode(stack_t **top, unsigned int line_number);
+/*Stack operations*/
+stack_t *create_node(int n);
+void free_nodes(void);
+void print_stack(stack_t **, unsigned int);
+void add_to_stack(stack_t **, unsigned int);
+void add_to_queue(stack_t **, unsigned int);
 
-/*helpers.c*/
-FILE *openfile(char *filename);
-size_t num_len(int num);
-void verify_number(char *token);
-void free_stack(stack_t *top);
+void call_fun(op_func, char *, char *, int, int);
+
+void print_top(stack_t **, unsigned int);
+void pop_top(stack_t **, unsigned int);
+void nop(stack_t **, unsigned int);
+void swap_nodes(stack_t **, unsigned int);
+
+/*Math operations with nodes*/
+void add_nodes(stack_t **, unsigned int);
+void sub_nodes(stack_t **, unsigned int);
+void div_nodes(stack_t **, unsigned int);
+void mul_nodes(stack_t **, unsigned int);
+void mod_nodes(stack_t **, unsigned int);
+
+/*String operations*/
+void print_char(stack_t **, unsigned int);
+void print_str(stack_t **, unsigned int);
+void rotl(stack_t **, unsigned int);
+
+/*Error hanlding*/
+void err(int error_code, ...);
+void more_err(int error_code, ...);
+void string_err(int error_code, ...);
+void rotr(stack_t **, unsigned int);
 
 #endif
